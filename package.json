@@ -1,0 +1,28 @@
+{
+  "name": "moneyd-uplink-xrp",
+  "version": "1.0.0",
+  "description": "ILP provider using XRP payment channels",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint ."
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^2.3.0",
+    "good-table": "^1.0.3",
+    "ilp-plugin-xrp-asym-client": "^1.1.4",
+    "ilp-plugin-xrp-paychan-shared": "^3.0.3",
+    "moment": "^2.22.1",
+    "node-fetch": "^2.1.2"
+  },
+  "devDependencies": {
+    "eslint": "^4.16.0",
+    "eslint-config-standard": "^11.0.0-beta.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-node": "^5.2.1",
+    "eslint-plugin-promise": "^3.6.0",
+    "eslint-plugin-standard": "^3.0.1"
+  }
+}
