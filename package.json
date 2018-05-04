@@ -14,8 +14,11 @@
     "good-table": "^1.0.3",
     "ilp-plugin-xrp-asym-client": "^1.1.4",
     "ilp-plugin-xrp-paychan-shared": "^3.0.3",
+    "inquirer": "^5.2.0",
     "moment": "^2.22.1",
-    "node-fetch": "^2.1.2"
+    "node-fetch": "^2.1.2",
+    "ripple-address-codec": "^2.0.1",
+    "ripple-keypairs": "^0.10.1"
   },
   "devDependencies": {
     "eslint": "^4.16.0",

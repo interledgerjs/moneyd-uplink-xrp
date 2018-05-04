@@ -2,8 +2,11 @@
 const crypto = require('crypto')
 const fetch = require('node-fetch')
 const { RippleAPI } = require('ripple-lib')
+const { isValidSeed } = require('ripple-address-codec')
+const { deriveKeypair, deriveAddress } = require('ripple-keypairs')
 const table = require('good-table')
 const chalk = require('chalk')
+const inquirer = require('inquirer')
 const moment = require('moment')
 const Plugin = require('ilp-plugin-xrp-asym-client')
 const { createSubmitter } = require('ilp-plugin-xrp-paychan-shared')
@@ -11,6 +14,104 @@ const connectorList = require('./connector_list.json')
 const parentBtpHmacKey = 'parent_btp_uri'
 const DEFAULT_RIPPLED = 'wss://s1.ripple.com'
 const DEFAULT_TESTNET_RIPPLED = 'wss://s.altnet.rippletest.net:51233'
+
+async function configure ({ testnet, advanced }) {
+  const servers = connectorList[testnet ? 'test' : 'live']
+  const defaultParent = servers[Math.floor(Math.random() * servers.length)]
+  const res = {}
+  const fields = [{
+    type: 'input',
+    name: 'parent',
+    message: 'BTP host of parent connector:',
+    default: defaultParent
+  }, {
+    type: 'input',
+    name: 'name',
+    message: 'Name to assign to this channel:',
+    default: ''
+  }, {
+    type: 'input',
+    name: 'secret',
+    message: 'XRP secret' + (testnet ? ' (optional):' : ':'),
+    default: testnet ? '' : undefined,
+    validate: (secret) => (testnet && secret.length === 0) || isValidSeed(secret)
+  }, {
+    type: 'input',
+    name: 'xrpServer',
+    message: 'Rippled server:',
+    default: testnet ? DEFAULT_TESTNET_RIPPLED : DEFAULT_RIPPLED
+  }]
+  for (const field of fields) {
+    if (advanced || field.default === undefined) {
+      res[field.name] = (await inquirer.prompt(field))[field.name]
+    } else {
+      res[field.name] = field.default
+    }
+  }
+
+  if (testnet && !res.secret) {
+    console.log('acquiring testnet account...')
+    const resp = await fetch('https://faucet.altnet.rippletest.net/accounts', { method: 'POST' })
+    const json = await resp.json()
+
+    res.address = json.account.address
+    res.secret = json.account.secret
+    console.log('got testnet address "' + res.address + '"')
+    console.log('waiting for testnet API to fund address...')
+    await new Promise(resolve => setTimeout(resolve, 10000))
+  }
+  const btpName = res.name || ''
+  const btpSecret = hmac(hmac(parentBtpHmacKey, res.parent + btpName), res.secret).toString('hex')
+  const btpServer = 'btp+wss://' + btpName + ':' + btpSecret + '@' + res.parent
+  return {
+    relation: 'parent',
+    plugin: require.resolve('ilp-plugin-xrp-asym-client'),
+    assetCode: 'XRP',
+    assetScale: 6,
+    balance: {
+      minimum: '-Infinity',
+      maximum: '20000',
+      settleThreshold: '5000',
+      settleTo: '10000'
+    },
+    options: {
+      server: btpServer,
+      secret: res.secret,
+      address: res.address || deriveAddress(deriveKeypair(res.secret).publicKey),
+      xrpServer: res.xrpServer
+    }
+  }
+}
+
+const commands = [
+  {
+    command: 'info',
+    describe: 'Get info about your XRP account and payment channels',
+    builder: {},
+    handler: (config, argv) => makeUplink(config).printChannels()
+  },
+  {
+    command: 'cleanup',
+    describe: 'Clean up unused payment channels',
+    builder: {},
+    handler: (config, argv) => makeUplink(config).cleanupChannels()
+  },
+  {
+    command: 'topup',
+    describe: 'Pre-fund your balance with connector',
+    builder: {
+      amount: {
+        description: 'amount to send to connector',
+        demandOption: true
+      }
+    },
+    handler: (config, {amount}) => makeUplink(config).topup(amount)
+  }
+]
+
+function makeUplink (config) {
+  return new XrpUplink(config)
+}
 
 class XrpUplink {
   constructor (config) {
@@ -20,83 +121,14 @@ class XrpUplink {
     this.subscribed = false
   }
 
-  static async buildConfig (inquirer, { testnet }) {
-    const servers = connectorList[testnet ? 'test' : 'live']
-    const defaultParent = servers[Math.floor(Math.random() * servers.length)]
-    const res = await inquirer.prompt([{
-      type: 'input',
-      name: 'parent',
-      message: 'BTP host of parent connector:',
-      default: defaultParent
-    }, {
-      type: 'input',
-      name: 'name',
-      message: 'Name to assign to this channel. Must be changed if other parameters are changed.',
-      default: ''
-    }, {
-      type: 'input',
-      name: 'secret',
-      message: 'XRP secret' + (testnet ? ' (optional):' : ':'),
-      // Secret is optional when testnet is set.
-      validate: (secret) => testnet || secret.length !== 0
-    }, {
-      type: 'input',
-      name: 'address',
-      message: 'XRP address (optional):'
-    }, {
-      type: 'input',
-      name: 'xrpServer',
-      message: 'Rippled server:',
-      default: testnet ? DEFAULT_TESTNET_RIPPLED : DEFAULT_RIPPLED
-    }])
-
-    const btpName = res.name || ''
-    const btpSecret = hmac(hmac(parentBtpHmacKey, res.parent + btpName), res.secret).toString('hex')
-    const btpServer = 'btp+wss://' + btpName + ':' + btpSecret + '@' + res.parent
-    if (testnet && !res.secret) {
-      console.log('acquiring testnet account...')
-      const res = await fetch('https://faucet.altnet.rippletest.net/accounts', { method: 'POST' })
-      const json = await res.json()
-
-      res.address = json.account.address
-      res.secret = json.account.secret
-      console.log('got testnet address "' + res.address + '"')
-      console.log('waiting for testnet API to fund address...')
-      await new Promise(resolve => setTimeout(resolve, 10000))
-    }
-    return {
-      relation: 'parent',
-      plugin: require.resolve('ilp-plugin-xrp-asym-client'),
-      assetCode: 'XRP',
-      assetScale: 6,
-      balance: {
-        minimum: '-Infinity',
-        maximum: '20000',
-        settleThreshold: '5000',
-        settleTo: '10000'
-      },
-      options: {
-        server: btpServer,
-        secret: res.secret,
-        address: res.address || undefined,
-        xrpServer: res.xrpServer
-      }
-    }
+  async printChannels () {
+    await this._printChannels(await this._listChannels())
   }
 
-  getPlugin () { return new Plugin(this.pluginOpts) }
-
-  async listChannels () {
-    const api = await this._rippleApi()
-    console.log('fetching channels...')
-    const res = await api.connection.request({
-      command: 'account_channels',
-      account: this.pluginOpts.address
-    })
-    return res.channels
-  }
-
-  async printChannels (channels) {
+  async _printChannels (channels) {
+    if (!channels.length) {
+      return console.error('No channels found')
+    }
     console.log('connecting to xrp ledger...')
     const api = await this._rippleApi()
     const res = await api.getAccountInfo(this.pluginOpts.address)
@@ -112,7 +144,18 @@ class XrpUplink {
     ]))
   }
 
-  async cleanupChannels (channels) {
+  async cleanupChannels () {
+    const allChannels = await this._listChannels()
+    await this._printChannels(allChannels)
+    if (!allChannels.length) return
+    const result = await inquirer.prompt({
+      type: 'checkbox',
+      name: 'marked',
+      message: 'Select channels to close:',
+      choices: allChannels.map((_, i) => i.toString())
+    })
+    const channels = result.marked.map((index) => allChannels[+index])
+
     const submitter = await this._submitter()
     for (const channel of channels) {
       const channelId = channel.channel_id
@@ -126,6 +169,22 @@ class XrpUplink {
         console.error('Warning for channel ' + channelId + ':', err.message)
       }
     }
+  }
+
+  async _listChannels () {
+    const api = await this._rippleApi()
+    console.log('fetching channels...')
+    const res = await api.connection.request({
+      command: 'account_channels',
+      account: this.pluginOpts.address
+    })
+    return res.channels
+  }
+
+  async topup (amount) {
+    const plugin = new Plugin(this.pluginOpts)
+    await plugin.connect()
+    await plugin.sendMoney(amount)
   }
 
   async _rippleApi () {
@@ -174,4 +233,7 @@ function hmac (key, message) {
   return h.digest()
 }
 
-module.exports = XrpUplink
+module.exports = {
+  configure,
+  commands
+}
