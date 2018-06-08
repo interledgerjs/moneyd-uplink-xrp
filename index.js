@@ -248,10 +248,9 @@ async function validateAddress (server, address) {
     reserveIncrementXRP
   }} = await api.getServerInfo()
 
-  const minBalance = (+reserveBaseXRP) +
-    (+reserveIncrementXRP) * accountInfo.ownerCount +
+  const minBalance = (+reserveBaseXRP) + (+reserveIncrementXRP) * accountInfo.ownerCount + // total current reserve
     (+reserveIncrementXRP) + // reserve for the channel
-    10 + // OUTGOING_CHANNEL_DEFAULT_AMOUNT_XRP from ilp-plugin-xrp-asym-client
+    (+Plugin.OUTGOING_CHANNEL_DEFAULT_AMOUNT) +
     1 // extra to cover channel create fee
   const currentBalance = +accountInfo.xrpBalance
   if (currentBalance < minBalance) {
