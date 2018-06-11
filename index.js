@@ -83,6 +83,8 @@ async function configure ({ testnet, advanced }) {
       settleThreshold: '5000',
       settleTo: '10000'
     },
+    sendRoutes: false,
+    receiveRoutes: false,
     options: {
       server: btpServer,
       secret: res.secret,
