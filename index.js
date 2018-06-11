@@ -59,6 +59,15 @@ async function configure ({ testnet, advanced }) {
     console.log('got testnet address "' + res.address + '"')
     console.log('waiting for testnet API to fund address...')
     await new Promise(resolve => setTimeout(resolve, 10000))
+  } else {
+    if (!res.address) {
+      res.address = deriveAddress(deriveKeypair(res.secret).publicKey)
+    }
+    // Ensure that the given account exists and has enough XRP to create a channel.
+    await validateAddress(res.xrpServer, res.address).catch((err) => {
+      console.error('Error configuring uplink: ' + err.message)
+      process.exit(1)
+    })
   }
   const btpName = res.name || ''
   const btpSecret = hmac(hmac(parentBtpHmacKey, res.parent + btpName), res.secret).toString('hex')
@@ -77,7 +86,7 @@ async function configure ({ testnet, advanced }) {
     options: {
       server: btpServer,
       secret: res.secret,
-      address: res.address || deriveAddress(deriveKeypair(res.secret).publicKey),
+      address: res.address,
       xrpServer: res.xrpServer
     }
   }
@@ -126,14 +135,14 @@ class XrpUplink {
   }
 
   async _printChannels (channels) {
-    if (!channels.length) {
-      return console.error('No channels found')
-    }
     console.log('connecting to xrp ledger...')
     const api = await this._rippleApi()
     const res = await api.getAccountInfo(this.pluginOpts.address)
     console.log(chalk.green('account:'), this.pluginOpts.address)
     console.log(chalk.green('balance:'), res.xrpBalance + ' XRP')
+    if (!channels.length) {
+      return console.error('No channels found')
+    }
     console.log(table([
       [ chalk.green('index'),
         chalk.green('destination'),
@@ -225,6 +234,28 @@ function formatChannelToRow (c, i) {
     c.balance,
     formatChannelExpiration(c.expiration)
   ]
+}
+
+async function validateAddress (server, address) {
+  const api = new RippleAPI({ server })
+  await api.connect()
+  const accountInfo = await api.getAccountInfo(address).catch((err) => {
+    if (err.message !== 'actNotFound') throw err
+    throw new Error('Address "' + address + '" does not exist on ' + server)
+  })
+  const {validatedLedger: {
+    reserveBaseXRP,
+    reserveIncrementXRP
+  }} = await api.getServerInfo()
+
+  const minBalance = (+reserveBaseXRP) + (+reserveIncrementXRP) * accountInfo.ownerCount + // total current reserve
+    (+reserveIncrementXRP) + // reserve for the channel
+    (+Plugin.OUTGOING_CHANNEL_DEFAULT_AMOUNT) +
+    1 // extra to cover channel create fee
+  const currentBalance = +accountInfo.xrpBalance
+  if (currentBalance < minBalance) {
+    throw new Error('account balance is too low (must be at least ' + minBalance + ')')
+  }
 }
 
 function hmac (key, message) {
