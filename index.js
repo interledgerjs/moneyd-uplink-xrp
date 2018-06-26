@@ -14,6 +14,11 @@ const connectorList = require('./connector_list.json')
 const parentBtpHmacKey = 'parent_btp_uri'
 const DEFAULT_RIPPLED = 'wss://s1.ripple.com'
 const DEFAULT_TESTNET_RIPPLED = 'wss://s.altnet.rippletest.net:51233'
+const base64url = buf => buf
+  .toString('base64')
+  .replace(/=/g, '')
+  .replace(/\+/g, '-')
+  .replace(/\//g, '_')
 
 async function configure ({ testnet, advanced }) {
   const servers = connectorList[testnet ? 'test' : 'live']
@@ -28,7 +33,7 @@ async function configure ({ testnet, advanced }) {
     type: 'input',
     name: 'name',
     message: 'Name to assign to this channel:',
-    default: ''
+    default: base64url(crypto.randomBytes(32))
   }, {
     type: 'input',
     name: 'secret',
