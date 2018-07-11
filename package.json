@@ -12,7 +12,7 @@
   "dependencies": {
     "chalk": "^2.3.0",
     "good-table": "^1.0.3",
-    "ilp-plugin-xrp-asym-client": "^1.5.1",
+    "ilp-plugin-xrp-asym-client": "^1.5.2",
     "ilp-plugin-xrp-paychan-shared": "^3.0.3",
     "inquirer": "^5.2.0",
     "moment": "^2.22.1",
