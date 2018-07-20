@@ -12,8 +12,7 @@ const Plugin = require('ilp-plugin-xrp-asym-client')
 const { createSubmitter } = require('ilp-plugin-xrp-paychan-shared')
 const connectorList = require('./connector_list.json')
 const parentBtpHmacKey = 'parent_btp_uri'
-const DEFAULT_RIPPLED = 'wss://s1.ripple.com'
-const DEFAULT_TESTNET_RIPPLED = 'wss://s.altnet.rippletest.net:51233'
+const rippledList = require('./rippled_list.json')
 const base64url = buf => buf
   .toString('base64')
   .replace(/=/g, '')
@@ -23,6 +22,8 @@ const base64url = buf => buf
 async function configure ({ testnet, advanced }) {
   const servers = connectorList[testnet ? 'test' : 'live']
   const defaultParent = servers[Math.floor(Math.random() * servers.length)]
+  const rippledServers = rippledList[testnet ? 'test' : 'live']
+  const defaultRippled = rippledServers[Math.floor(Math.random() * rippledServers.length)]
   const res = {}
   const fields = [{
     type: 'input',
@@ -44,7 +45,7 @@ async function configure ({ testnet, advanced }) {
     type: 'input',
     name: 'xrpServer',
     message: 'Rippled server:',
-    default: testnet ? DEFAULT_TESTNET_RIPPLED : DEFAULT_RIPPLED
+    default: defaultRippled
   }]
   for (const field of fields) {
     if (advanced || field.default === undefined) {
