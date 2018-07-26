@@ -1,6 +1,6 @@
 {
   "name": "moneyd-uplink-xrp",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "ILP provider using XRP payment channels",
   "main": "index.js",
   "scripts": {
