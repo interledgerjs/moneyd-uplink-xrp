@@ -148,6 +148,9 @@ class XrpUplink {
     const res = await api.getAccountInfo(this.pluginOpts.address)
     console.log(chalk.green('account:'), this.pluginOpts.address)
     console.log(chalk.green('balance:'), res.xrpBalance + ' XRP')
+    console.log(chalk.yellow('  reserved:'), String(res.ownerCount * 5 + 20) + ' XRP')
+    console.log(chalk.yellow('  available:'), (Number(res.xrpBalance) - res.ownerCount * 5 - 20) + ' XRP')
+    console.log()
     if (!channels.length) {
       return console.error('No channels found')
     }
