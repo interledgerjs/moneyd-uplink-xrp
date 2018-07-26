@@ -146,10 +146,14 @@ class XrpUplink {
     console.log('connecting to xrp ledger...')
     const api = await this._rippleApi()
     const res = await api.getAccountInfo(this.pluginOpts.address)
+    const serverInfo = await api.getServerInfo()
+    const reserveBase = serverInfo.validatedLedger.reserveBaseXRP
+    const reserveInc = serverInfo.validatedLedger.reserveIncrementXRP
+    const reserved = res.ownerCount * reserveInc + reserveBase
     console.log(chalk.green('account:'), this.pluginOpts.address)
     console.log(chalk.green('balance:'), res.xrpBalance + ' XRP')
-    console.log(chalk.yellow('  reserved:'), String(res.ownerCount * 5 + 20) + ' XRP')
-    console.log(chalk.yellow('  available:'), (Number(res.xrpBalance) - res.ownerCount * 5 - 20) + ' XRP')
+    console.log(chalk.yellow('  reserved:'), String(reserved) + ' XRP')
+    console.log(chalk.yellow('  available:'), (Number(res.xrpBalance) - reserved) + ' XRP')
     console.log()
     if (!channels.length) {
       return console.error('No channels found')
