@@ -154,8 +154,10 @@ class XrpUplink {
     if (!channels.length) {
       return console.error('No channels found')
     }
+
     console.log(table([
       [ chalk.green('index'),
+        chalk.green('channel id'),
         chalk.green('destination'),
         chalk.green('amount (drops)'),
         chalk.green('balance (drops)'),
@@ -240,9 +242,10 @@ function formatChannelExpiration (exp) {
 function formatChannelToRow (c, i) {
   return [
     String(i),
+    c.channel_id.substring(0, 8) + '...',
     c.destination_account,
-    c.amount,
-    c.balance,
+    comma(c.amount),
+    comma(c.balance),
     formatChannelExpiration(c.expiration)
   ]
 }
@@ -267,6 +270,19 @@ async function validateAddress (server, address) {
   if (currentBalance < minBalance) {
     throw new Error('account balance is too low (must be at least ' + minBalance + ')')
   }
+}
+
+function comma (a) {
+  return a
+    .split('')
+    .map((e, i) => {
+      if ((a.length - i) % 3 === 1 && i < a.length - 1) {
+        return e + ','
+      } else {
+        return e
+      }
+    })
+    .join('')
 }
 
 function hmac (key, message) {
