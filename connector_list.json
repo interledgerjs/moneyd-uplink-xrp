@@ -8,7 +8,9 @@
     "btp3.mlab.company",
     "btp.connector0.com",
     "btp.tinypolarbear.com",
-    "btp.mofu.io"
+    "btp.mofu.io",
+    "ilp.phobosnode.com",
+    "btp.phobosnode.com"
   ],
   "test": [
     "amundsen.ilpdemo.org:1811"
