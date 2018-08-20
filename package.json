@@ -8,7 +8,7 @@
     "lint": "eslint ."
   },
   "author": "",
-  "license": "ISC",
+  "license": "Apache-2.0",
   "dependencies": {
     "chalk": "^2.3.0",
     "good-table": "^1.0.3",
