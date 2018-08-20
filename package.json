@@ -8,23 +8,23 @@
     "lint": "eslint ."
   },
   "author": "",
-  "license": "ISC",
+  "license": "Apache-2.0",
   "dependencies": {
     "chalk": "^2.3.0",
     "good-table": "^1.0.3",
     "ilp-plugin-xrp-asym-client": "^1.5.3",
-    "ilp-plugin-xrp-paychan-shared": "^3.0.3",
-    "inquirer": "^5.2.0",
+    "ilp-plugin-xrp-paychan-shared": "^4.0.1",
+    "inquirer": "^6.1.0",
     "moment": "^2.22.1",
     "node-fetch": "^2.1.2",
     "ripple-address-codec": "^2.0.1",
     "ripple-keypairs": "^0.10.1"
   },
   "devDependencies": {
-    "eslint": "^4.16.0",
+    "eslint": "^5.3.0",
     "eslint-config-standard": "^11.0.0-beta.0",
     "eslint-plugin-import": "^2.8.0",
-    "eslint-plugin-node": "^5.2.1",
+    "eslint-plugin-node": "^7.0.1",
     "eslint-plugin-promise": "^3.6.0",
     "eslint-plugin-standard": "^3.0.1"
   }
