@@ -9,8 +9,7 @@
     "btp.connector0.com",
     "btp.tinypolarbear.com",
     "btp.mofu.io",
-    "ilp.phobosnode.com",
-    "btp.phobosnode.com"
+    "ilsp1.phobosnode.com",
   ],
   "test": [
     "amundsen.ilpdemo.org:1811"
