@@ -122,7 +122,7 @@ const commands = [
         demandOption: true
       }
     },
-    handler: (config, {amount}) => makeUplink(config).topup(amount)
+    handler: (config, { amount }) => makeUplink(config).topup(amount)
   }
 ]
 
@@ -261,10 +261,10 @@ async function validateAddress (server, address) {
     if (err.message !== 'actNotFound') throw err
     throw new Error('Address "' + address + '" does not exist on ' + server)
   })
-  const {validatedLedger: {
+  const { validatedLedger: {
     reserveBaseXRP,
     reserveIncrementXRP
-  }} = await api.getServerInfo()
+  } } = await api.getServerInfo()
 
   const minBalance = (+reserveBaseXRP) + (+reserveIncrementXRP) * accountInfo.ownerCount + // total current reserve
     (+reserveIncrementXRP) + // reserve for the channel
