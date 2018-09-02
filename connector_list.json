@@ -7,6 +7,8 @@
     "btp3.mlab.company",
     "btp.connector0.com",
     "btp.tinypolarbear.com",
+    "btp.strata-ilsp-1.com",
+    "btp.strata-ilsp-2.com"
   ],
   "test": [
     "amundsen.ilpdemo.org:1811"
