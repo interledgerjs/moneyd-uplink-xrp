@@ -1,14 +1,15 @@
 {
   "live": [
-    "ilp1.internetofvalue.xyz",
+    "btp.connector0.com",
+    "btp.strata-ilsp-1.com",
+    "btp.strata-ilsp-2.com",
+    "btp.tinypolarbear.com",
     "btp1.mlab.company",
-    "client.scyl.la",
     "btp2.mlab.company",
     "btp3.mlab.company",
-    "btp.connector0.com",
-    "btp.tinypolarbear.com",
-    "btp.strata-ilsp-1.com",
-    "btp.strata-ilsp-2.com"
+    "client.scyl.la",
+    "ilp.worldconnector.link",
+    "ilp1.internetofvalue.xyz"
   ],
   "test": [
     "amundsen.ilpdemo.org:1811"
