@@ -17,7 +17,7 @@
     "chalk": "^2.4.1",
     "good-table": "^1.0.3",
     "ilp-plugin-xrp-asym-client": "^1.5.3",
-    "ilp-plugin-xrp-paychan-shared": "^4.0.1",
+    "ilp-plugin-xrp-paychan-shared": "^4.1.1",
     "inquirer": "^6.2.0",
     "moment": "^2.22.2",
     "node-fetch": "^2.2.0",
