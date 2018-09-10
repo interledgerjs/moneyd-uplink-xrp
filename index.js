@@ -13,6 +13,7 @@ const { createSubmitter } = require('ilp-plugin-xrp-paychan-shared')
 const connectorList = require('./connector_list.json')
 const parentBtpHmacKey = 'parent_btp_uri'
 const rippledList = require('./rippled_list.json')
+const MemoryStore = require('ilp-store-memory')
 const base64url = buf => buf
   .toString('base64')
   .replace(/=/g, '')
@@ -135,6 +136,7 @@ class XrpUplink {
     this.config = config
     this.pluginOpts = config.options
     this.api = null
+    this.store = null // TODO: Make this configurable
     this.subscribed = false
   }
 
@@ -221,8 +223,16 @@ class XrpUplink {
     return this.api
   }
 
+  async _store () {
+    if (!this.store) {
+      this.store = new MemoryStore()
+    }
+    return this.store
+  }
+
   async _submitter () {
     const api = await this._rippleApi()
+    const store = await this._store()
 
     if (!this.subscribed) {
       this.subscribed = true
@@ -232,7 +242,7 @@ class XrpUplink {
       })
     }
 
-    return createSubmitter(api, this.pluginOpts.address, this.pluginOpts.secret)
+    return createSubmitter(api, this.pluginOpts.address, this.pluginOpts.secret, store)
   }
 }
 
