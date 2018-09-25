@@ -92,6 +92,7 @@ async function configure ({ testnet, advanced }) {
     sendRoutes: false,
     receiveRoutes: false,
     options: {
+      currencyScale: 9,
       server: btpServer,
       secret: res.secret,
       address: res.address,
