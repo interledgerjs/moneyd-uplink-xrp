@@ -2,7 +2,7 @@
 const crypto = require('crypto')
 const fetch = require('node-fetch')
 const { RippleAPI } = require('ripple-lib')
-const { isValidSeed } = require('ripple-address-codec')
+const { isValidAccountID, isValidSeed } = require('ripple-address-codec')
 const { deriveKeypair, deriveAddress } = require('ripple-keypairs')
 const table = require('good-table')
 const chalk = require('chalk')
@@ -37,15 +37,15 @@ async function configure ({ testnet, advanced }) {
     default: base64url(crypto.randomBytes(32))
   }, {
     type: 'input',
-    name: 'secret',
-    message: 'XRP secret' + (testnet ? ' (optional):' : ':'),
-    default: testnet ? '' : undefined,
-    validate: (secret) => (testnet && secret.length === 0) || isValidSeed(secret)
-  }, {
-    type: 'input',
     name: 'xrpServer',
     message: 'Rippled server:',
     default: defaultRippled
+  }, {
+    type: 'password',
+    name: 'secret',
+    message: 'XRP secret (master or regular key)' + (testnet ? ' (optional):' : ':'),
+    mask: '*',
+    validate: (secret) => (testnet && secret.length === 0) || isValidSeed(secret)
   }]
   for (const field of fields) {
     if (advanced || field.default === undefined) {
@@ -66,9 +66,13 @@ async function configure ({ testnet, advanced }) {
     console.log('waiting for testnet API to fund address...')
     await new Promise(resolve => setTimeout(resolve, 10000))
   } else {
-    if (!res.address) {
-      res.address = deriveAddress(deriveKeypair(res.secret).publicKey)
-    }
+    res.address = (await inquirer.prompt({
+      type: 'input',
+      name: 'address',
+      message: 'XRP address:',
+      default: deriveAddress(deriveKeypair(res.secret).publicKey),
+      validate: (address) => isValidAccountID(address)
+    })).address
     // Ensure that the given account exists and has enough XRP to create a channel.
     await validateAddress(res.xrpServer, res.address).catch((err) => {
       console.error('Error configuring uplink: ' + err.message)
