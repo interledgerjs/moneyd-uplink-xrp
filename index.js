@@ -82,16 +82,17 @@ async function configure ({ testnet, advanced }) {
     relation: 'parent',
     plugin: require.resolve('ilp-plugin-xrp-asym-client'),
     assetCode: 'XRP',
-    assetScale: 6,
+    assetScale: 9,
     balance: {
       minimum: '-Infinity',
-      maximum: '20000',
-      settleThreshold: '5000',
-      settleTo: '10000'
+      maximum: '20000000',
+      settleThreshold: '5000000',
+      settleTo: '10000000'
     },
     sendRoutes: false,
     receiveRoutes: false,
     options: {
+      currencyScale: 9,
       server: btpServer,
       secret: res.secret,
       address: res.address,
