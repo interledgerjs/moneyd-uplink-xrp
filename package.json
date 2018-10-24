@@ -22,7 +22,7 @@
     "moment": "^2.22.2",
     "node-fetch": "^2.2.0",
     "ripple-address-codec": "^2.0.1",
-    "ripple-keypairs": "^0.10.1"
+    "ripple-keypairs": "^0.10.2"
   },
   "devDependencies": {
     "eslint": "^5.5.0",
