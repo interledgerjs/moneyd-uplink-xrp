@@ -1,7 +1,6 @@
 {
   "live": [
-    "btp.strata-ilsp-1.com:8079",
-    "btp.strata-ilsp-2.com:8079"
+    "open.strata-ilsp.com"
   ],
   "old": [
     "btp.connector0.com",
