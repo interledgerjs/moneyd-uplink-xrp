@@ -14,9 +14,7 @@
     "ilsp1.phobosnode.com"
   ],
   "test": [
-    "test.styra.network/1a/xrp"
-  ],
-  "more-tests": [
+    "test.styra.network/1a/xrp",
     "testnet.ilpnetwork.dev/testnet/xrp"
   ]
 }
