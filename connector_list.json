@@ -16,5 +16,6 @@
   "test": [
     "test.styra.network/1a/xrp",
     "testnet.ilpnetwork.dev/testnet/xrp"
+    "strata-ilsp.com/testnet/xrp",
   ]
 }
