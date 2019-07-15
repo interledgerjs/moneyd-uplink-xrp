@@ -14,6 +14,7 @@
     "ilsp1.phobosnode.com"
   ],
   "test": [
-    "strata-ilsp.com/testnet/xrp"
+    "strata-ilsp.com/testnet/xrp",
+    "test.styra.network/1b/xrp"
   ]
 }
