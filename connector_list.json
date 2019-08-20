@@ -14,6 +14,9 @@
   ],
   "test": [
     "strata-ilsp.com/testnet/xrp",
-    "test.styra.network/1b/xrp"
+    "test.styra.network/1b/xrp",
+    "js1.xpring.dev",
+    "js2.xpring.dev",
+    "js3.xpring.dev"
   ]
 }
