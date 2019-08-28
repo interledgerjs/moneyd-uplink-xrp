@@ -1,6 +1,6 @@
 {
   "live": [
-    "strata-ilsp.com/xrp"
+    "ilsp1.phobosnode.com/moneyd"
   ],
   "old": [
     "btp.connector0.com",
@@ -10,7 +10,7 @@
     "client.scyl.la",
     "ilp.worldconnector.link",
     "ilp1.internetofvalue.xyz",
-    "ilsp1.phobosnode.com"
+    "strata-ilsp.com/xrp"
   ],
   "test": [
     "strata-ilsp.com/testnet/xrp",
