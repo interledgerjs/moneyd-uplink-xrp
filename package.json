@@ -21,7 +21,7 @@
     "inquirer": "^6.2.0",
     "moment": "^2.22.2",
     "node-fetch": "^2.2.0",
-    "ripple-address-codec": "^2.0.1",
+    "ripple-address-codec": "^3.0.4",
     "ripple-keypairs": "^0.10.1"
   },
   "devDependencies": {
