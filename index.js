@@ -164,14 +164,19 @@ class XrpUplink {
       return console.error('No channels found')
     }
 
+    const scale = this.config.assetScale
+
     console.log(table([
       [ chalk.green('index'),
         chalk.green('channel id'),
         chalk.green('destination'),
-        chalk.green('amount (drops)'),
-        chalk.green('balance (drops)'),
+        chalk.green('amount (1E' + String(scale * -1) + 'XRP)'),
+        chalk.green('balance (1E' + String(scale * -1) + 'XRP)'),
         chalk.green('expiry') ],
-      ...channels.map(formatChannelToRow)
+      ...channels.map(
+        function(c, i) {
+          return formatChannelToRow(c, i, scale)
+        })
     ]))
   }
 
@@ -248,13 +253,16 @@ function formatChannelExpiration (exp) {
   return chalk.yellow('in ' + moment.duration(unixExp - Date.now()).humanize())
 }
 
-function formatChannelToRow (c, i) {
+function formatChannelToRow (c, i, s) {
+  const scaled_amount = c.amount * (10 ** (s - 6)) // base scale is drops (1E-6)
+  const scaled_balance = c.balance * (10 ** (s - 6))
+
   return [
     String(i),
     c.channel_id.substring(0, 8) + '...',
     c.destination_account,
-    comma(c.amount),
-    comma(c.balance),
+    comma(String(scaled_amount)),
+    comma(String(scaled_balance)),
     formatChannelExpiration(c.expiration)
   ]
 }
