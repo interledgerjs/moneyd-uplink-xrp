@@ -14,7 +14,7 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "chalk": "^2.4.1",
+    "chalk": "^4.0.0",
     "good-table": "^1.0.3",
     "ilp-plugin-xrp-asym-client": "^1.5.3",
     "ilp-plugin-xrp-paychan-shared": "^4.1.1",
